@@ -3,11 +3,13 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Search } from "lucide-react"
+import { Search, Grid3x3, Table2, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import SearchFilters from "@/components/SearchFilters"
 import ProductCard from "@/components/ProductCard"
+import ProductStats from "@/components/ProductStats"
+import DataTable from "@/components/DataTable"
 import { searchProducts } from "@/lib/api"
 import type { Product, SearchFilters as FilterType } from "@/lib/types"
 
@@ -28,6 +30,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [count, setCount] = useState(0)
   const [searchInput, setSearchInput] = useState("")
+  const [viewMode, setViewMode] = useState<"grid" | "table" | "stats">("grid")
 
   function updateFilter(key: keyof FilterType, value: string) {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -129,12 +132,60 @@ export default function HomePage() {
                     <span className="text-foreground font-semibold">{count}</span> produit{count > 1 ? "s" : ""} trouvé
                     {count > 1 ? "s" : ""}
                   </p>
+                  <div className="flex gap-2 bg-white/90 backdrop-blur-sm rounded-xl p-1 border border-gray-200 shadow-sm">
+                    <Button
+                      variant={viewMode === "grid" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setViewMode("grid")}
+                      className={`h-9 px-4 rounded-lg transition-all ${
+                        viewMode === "grid" 
+                          ? "bg-primary text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Grid3x3 className="w-4 h-4 mr-2" />
+                      Grille
+                    </Button>
+                    <Button
+                      variant={viewMode === "table" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setViewMode("table")}
+                      className={`h-9 px-4 rounded-lg transition-all ${
+                        viewMode === "table" 
+                          ? "bg-primary text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Table2 className="w-4 h-4 mr-2" />
+                      Tableau
+                    </Button>
+                    <Button
+                      variant={viewMode === "stats" ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setViewMode("stats")}
+                      className={`h-9 px-4 rounded-lg transition-all ${
+                        viewMode === "stats" 
+                          ? "bg-primary text-white shadow-md" 
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4 mr-2" />
+                      Statistiques
+                    </Button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
-                    <ProductCard key={product.code} product={product} />
-                  ))}
-                </div>
+
+                {viewMode === "grid" && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                      <ProductCard key={product.code} product={product} />
+                    ))}
+                  </div>
+                )}
+
+                {viewMode === "table" && <DataTable products={products} />}
+
+                {viewMode === "stats" && <ProductStats products={products} />}
               </>
             ) : query || Object.values(filters).some((v) => v) ? (
               <div className="text-center py-20">

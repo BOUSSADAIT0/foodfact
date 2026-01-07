@@ -13,11 +13,6 @@ export interface Product {
   quantity?: string | null
   nutriscore_grade?: string | null
   ecoscore_grade?: string | null
-  nova_group?: number | null
-  ingredients_text?: string | null
-  allergens?: string | null
-  labels?: string | null
-  countries?: string | null
   image_url?: string | null
   image_small_url?: string | null
   nutriments?: Nutriments | null
@@ -34,7 +29,6 @@ export interface ProductDetailResponse {
 }
 
 export interface SearchFilters {
-  brand: string
   country: string
   sortBy: string
   order: string

@@ -1,17 +1,13 @@
 "use client"
 
-import { memo } from "react"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import type { SearchFilters } from "@/lib/types"
-import { Filter, RotateCcw, Globe, Tag, Zap, Candy, Droplet, ArrowUpDown } from "lucide-react"
+import { Globe, Zap, Candy, Droplet, ArrowUpDown } from "lucide-react"
+import type { SearchFilters as FilterType } from "@/lib/types"
 
 interface SearchFiltersProps {
-  filters: SearchFilters
-  onChange: (key: string, value: any) => void
-  onReset: () => void
+  filters: FilterType
+  onChange: (key: keyof FilterType, value: string) => void
 }
 
 const countries = [
@@ -24,43 +20,19 @@ const countries = [
   { value: "Italie", label: "🇮🇹 Italie" },
   { value: "Allemagne", label: "🇩🇪 Allemagne" },
   { value: "Maroc", label: "🇲🇦 Maroc" },
+  { value: "Tunisie", label: "🇹🇳 Tunisie" },
+  { value: "Algérie", label: "🇩🇿 Algérie" },
+  { value: "États-Unis", label: "🇺🇸 États-Unis" },
+  { value: "Royaume-Uni", label: "🇬🇧 Royaume-Uni" },
 ]
 
-function SearchFiltersComponent({ filters, onChange, onReset }: SearchFiltersProps) {
+export default function SearchFilters({ filters, onChange }: SearchFiltersProps) {
   return (
-    <Card className="bg-card border-border">
-      <CardContent className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Filtres Avancés</h2>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="h-8 w-8 p-0"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="brand" className="text-sm font-medium flex items-center gap-2">
-            <Tag className="w-4 h-4 text-primary" />
-            Marque
-          </Label>
-          <Input
-            id="brand"
-            value={filters.brand}
-            onChange={(e) => onChange("brand", e.target.value)}
-            placeholder="ex: Carrefour"
-            className="bg-background border-border"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="country" className="text-sm font-medium flex items-center gap-2">
+    <div className="w-full bg-white/90 backdrop-blur-sm border border-gray-200/80 rounded-xl shadow-sm p-6">
+      <div className="flex flex-wrap items-end gap-4">
+        {/* Filtre Pays */}
+        <div className="flex-1 min-w-[200px]">
+          <Label htmlFor="country" className="text-sm font-medium mb-2 flex items-center gap-2">
             <Globe className="w-4 h-4 text-primary" />
             Pays
           </Label>
@@ -68,7 +40,7 @@ function SearchFiltersComponent({ filters, onChange, onReset }: SearchFiltersPro
             id="country"
             value={filters.country}
             onChange={(e) => onChange("country", e.target.value)}
-            className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             {countries.map((country) => (
               <option key={country.value} value={country.value}>
@@ -76,11 +48,11 @@ function SearchFiltersComponent({ filters, onChange, onReset }: SearchFiltersPro
               </option>
             ))}
           </select>
-          <p className="text-xs text-muted-foreground">Filtrer par pays de disponibilité</p>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="sortBy" className="text-sm font-medium flex items-center gap-2">
+        {/* Filtre Trier par */}
+        <div className="flex-1 min-w-[200px]">
+          <Label htmlFor="sortBy" className="text-sm font-medium mb-2 flex items-center gap-2">
             <ArrowUpDown className="w-4 h-4 text-primary" />
             Trier par
           </Label>
@@ -88,7 +60,7 @@ function SearchFiltersComponent({ filters, onChange, onReset }: SearchFiltersPro
             id="sortBy"
             value={filters.sortBy}
             onChange={(e) => onChange("sortBy", e.target.value)}
-            className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           >
             <option value="">Aucun</option>
             <option value="energy">Énergie</option>
@@ -97,77 +69,114 @@ function SearchFiltersComponent({ filters, onChange, onReset }: SearchFiltersPro
           </select>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium flex items-center gap-2">
+        {/* Filtre Ordre (si sortBy est sélectionné) */}
+        {filters.sortBy && (
+          <div className="flex-1 min-w-[150px]">
+            <Label htmlFor="order" className="text-sm font-medium mb-2">
+              Ordre
+            </Label>
+            <select
+              id="order"
+              value={filters.order}
+              onChange={(e) => onChange("order", e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            >
+              <option value="asc">Croissant</option>
+              <option value="desc">Décroissant</option>
+            </select>
+          </div>
+        )}
+
+        {/* Filtre Énergie */}
+        <div className="flex-1 min-w-[200px]">
+          <Label className="text-sm font-medium mb-2 flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
-            Énergie (kcal/100g)
+            Énergie (kcal)
           </Label>
           <div className="grid grid-cols-2 gap-2">
-            <Input
-              placeholder="Min"
-              type="number"
-              value={filters.minEnergy}
-              onChange={(e) => onChange("minEnergy", e.target.value)}
-              className="bg-background border-border"
-            />
-            <Input
-              placeholder="Max"
-              type="number"
-              value={filters.maxEnergy}
-              onChange={(e) => onChange("maxEnergy", e.target.value)}
-              className="bg-background border-border"
-            />
+            <div>
+              <Input
+                id="minEnergy"
+                type="number"
+                value={filters.minEnergy}
+                onChange={(e) => onChange("minEnergy", e.target.value)}
+                placeholder="Min"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
+            <div>
+              <Input
+                id="maxEnergy"
+                type="number"
+                value={filters.maxEnergy}
+                onChange={(e) => onChange("maxEnergy", e.target.value)}
+                placeholder="Max"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium flex items-center gap-2">
+        {/* Filtre Sucres */}
+        <div className="flex-1 min-w-[200px]">
+          <Label className="text-sm font-medium mb-2 flex items-center gap-2">
             <Candy className="w-4 h-4 text-primary" />
-            Sucres (g/100g)
+            Sucres (g)
           </Label>
           <div className="grid grid-cols-2 gap-2">
-            <Input
-              placeholder="Min"
-              type="number"
-              value={filters.minSugar}
-              onChange={(e) => onChange("minSugar", e.target.value)}
-              className="bg-background border-border"
-            />
-            <Input
-              placeholder="Max"
-              type="number"
-              value={filters.maxSugar}
-              onChange={(e) => onChange("maxSugar", e.target.value)}
-              className="bg-background border-border"
-            />
+            <div>
+              <Input
+                id="minSugar"
+                type="number"
+                value={filters.minSugar}
+                onChange={(e) => onChange("minSugar", e.target.value)}
+                placeholder="Min"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
+            <div>
+              <Input
+                id="maxSugar"
+                type="number"
+                value={filters.maxSugar}
+                onChange={(e) => onChange("maxSugar", e.target.value)}
+                placeholder="Max"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-sm font-medium flex items-center gap-2">
+        {/* Filtre Matières grasses */}
+        <div className="flex-1 min-w-[200px]">
+          <Label className="text-sm font-medium mb-2 flex items-center gap-2">
             <Droplet className="w-4 h-4 text-primary" />
-            Matières grasses (g/100g)
+            Graisses (g)
           </Label>
           <div className="grid grid-cols-2 gap-2">
-            <Input
-              placeholder="Min"
-              type="number"
-              value={filters.minFat}
-              onChange={(e) => onChange("minFat", e.target.value)}
-              className="bg-background border-border"
-            />
-            <Input
-              placeholder="Max"
-              type="number"
-              value={filters.maxFat}
-              onChange={(e) => onChange("maxFat", e.target.value)}
-              className="bg-background border-border"
-            />
+            <div>
+              <Input
+                id="minFat"
+                type="number"
+                value={filters.minFat}
+                onChange={(e) => onChange("minFat", e.target.value)}
+                placeholder="Min"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
+            <div>
+              <Input
+                id="maxFat"
+                type="number"
+                value={filters.maxFat}
+                onChange={(e) => onChange("maxFat", e.target.value)}
+                placeholder="Max"
+                className="bg-white border-gray-200 focus:border-primary focus:ring-primary/20 text-sm"
+              />
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
-
-export default memo(SearchFiltersComponent)

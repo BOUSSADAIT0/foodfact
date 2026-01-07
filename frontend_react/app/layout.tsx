@@ -14,7 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "FoodFact Recherche - Découvrez des Choix Alimentaires Plus Sains",
+  title: "NutriRecherche - Découvrez des Choix Alimentaires Plus Sains",
   description:
     "Recherche avancée de produits alimentaires avec informations nutritionnelles, Nutri-Score et alternatives plus saines",
 }

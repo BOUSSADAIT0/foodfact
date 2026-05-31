@@ -62,11 +62,32 @@ object ProductResponse {
   given Encoder[ProductResponse] = deriveEncoder
 }
 
-case class SearchResponse(
+/** Raw response from OpenFoodFacts search API */
+case class OffSearchResponse(
   count: Int,
   products: List[Product]
 )
-object SearchResponse {
-  given Decoder[SearchResponse] = deriveDecoder
-  given Encoder[SearchResponse] = deriveEncoder
+
+object OffSearchResponse {
+  given Decoder[OffSearchResponse] = new Decoder[OffSearchResponse] {
+    def apply(c: HCursor): Decoder.Result[OffSearchResponse] =
+      for {
+        products <- c.downField("products").as[List[Product]]
+        count    <- c.downField("count").as[Option[Int]]
+      } yield OffSearchResponse(count.getOrElse(products.length), products)
+  }
+  given Encoder[OffSearchResponse] = deriveEncoder
+}
+
+/** API response returned to the frontend */
+case class ApiSearchResponse(
+  count: Int,
+  totalFromOff: Int,
+  page: Int,
+  pageSize: Int,
+  products: List[Product]
+)
+
+object ApiSearchResponse {
+  given Encoder[ApiSearchResponse] = deriveEncoder
 }

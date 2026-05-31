@@ -2,144 +2,150 @@
 
 FoodFact Recherche est une application web complète permettant de rechercher et d'explorer des informations nutritionnelles détaillées sur des produits alimentaires en utilisant les données d'OpenFoodFacts.
 
-## 📋 Vue d'ensemble
+## Vue d'ensemble
 
-Cette application est composée de deux parties principales :
-- **Frontend** : Application React/Next.js moderne et responsive
-- **Backend** : API REST en Scala utilisant http4s
+- **Frontend** : Application React/Next.js (port 3000)
+- **Backend** : API REST Scala/http4s (port 8080)
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
-- 🔍 Recherche avancée de produits alimentaires
-- 📊 Affichage des informations nutritionnelles complètes
-- 🏷️ Filtres par marque, pays, valeurs nutritionnelles
-- 📈 Scores Nutri-Score, Eco-Score et NOVA
-- 🌍 Filtrage par pays de disponibilité
-- 📱 Interface responsive et moderne
-- ⚡ Performances optimisées avec debounce et lazy loading
+- Recherche avec debounce et URL partageable
+- Filtres : marque, pays, Nutri-Score, NOVA, valeurs nutritionnelles
+- Pagination (« Charger plus »)
+- Page détail : ingrédients, allergènes, NOVA, lien OpenFoodFacts
+- Alternatives triées par Nutri-Score
+- Mode clair / sombre
+- Cache backend, rate limiting, health check
 
-## 🚀 Prérequis
+## Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé :
+- Git, Node.js 18+, npm
+- Scala 3.3+, sbt, Java 17+
+- Docker (optionnel, pour le backend)
 
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) (version 18 ou supérieure)
-- [npm](https://www.npmjs.com/) (généralement inclus avec Node.js)
-- [Scala](https://www.scala-lang.org/) (version 3.3+)
-- [sbt](https://www.scala-sbt.org/) (Scala Build Tool)
-- [Java](https://www.oracle.com/java/) (version 17 ou supérieure)
-
-## 📦 Installation
-
-### 1. Cloner le dépôt
+## Installation
 
 ```bash
 git clone https://github.com/Yamnyr/NutriRecherche.git
 cd NutriRecherche
+
+cd frontend_react && npm install
+# Backend : sbt télécharge les dépendances au premier lancement
 ```
 
-### 2. Installation du Frontend
+## Lancement
 
-```bash
-cd frontend_react
-npm install
-```
+### Backend (local)
 
-### 3. Installation du Backend
-
-Le backend utilise sbt qui téléchargera automatiquement les dépendances lors de la première compilation.
-
-## 🏃 Lancement
-
-### Option 1 : Lancer les deux services séparément
-
-**Terminal 1 - Backend :**
 ```bash
 cd backend_scala
-.\sbt.bat run
-# ou sur Linux/Mac:
-# sbt run
+.\sbt.bat run   # Windows
+# sbt run       # Linux/Mac
 ```
 
-Le backend sera disponible sur [http://localhost:8080](http://localhost:8080)
+Health check : [http://localhost:8080/health](http://localhost:8080/health)
 
-**Terminal 2 - Frontend :**
+### Frontend
+
 ```bash
 cd frontend_react
+cp .env.example .env.local   # optionnel
 npm run dev
 ```
 
-Le frontend sera disponible sur [http://localhost:3000](http://localhost:3000)
+Application : [http://localhost:3000](http://localhost:3000)
 
-### Option 2 : Utiliser les scripts de démarrage
+### Docker (backend uniquement)
 
-Consultez les README individuels dans chaque dossier pour plus de détails.
-
-## 📁 Structure du projet
-
-```
-FoodFact-Recherche/
-├── frontend_react/               # Frontend React/Next.js
-│   ├── app/                      # Pages et layouts Next.js
-│   ├── components/               # Composants React réutilisables
-│   ├── lib/                      # Utilitaires et API client
-│   └── README.md                 # Documentation frontend
-│
-├── backend_scala/                # Backend Scala
-│   ├── src/main/scala/           # Code source Scala
-│   │   ├── Models.scala          # Modèles de données
-│   │   ├── OpenFoodClient.scala  # Client API OpenFoodFacts
-│   │   └── Server.scala          # Serveur HTTP et routes
-│   └── README.md                 # Documentation backend
-│
-└── README.md                     # Ce fichier
+```bash
+docker compose up --build backend
 ```
 
-## 🔧 Configuration
+Puis lancer le frontend en local avec `NEXT_PUBLIC_API_URL=http://localhost:8080`.
 
-### Variables d'environnement
+## API
 
-**Frontend** (optionnel) :
+### `GET /health`
+
+Réponse : `{"status":"ok"}`
+
+### `GET /api/search`
+
+| Paramètre | Description |
+|-----------|-------------|
+| `q` | Terme de recherche (optionnel si filtres actifs) |
+| `brand` | Filtre marque |
+| `country` | Filtre pays |
+| `nutriscore` | Grades séparés par virgule (`a,b,c`) |
+| `nova` | Groupes NOVA (`1,2,3,4`) |
+| `minEnergy`, `maxEnergy` | Plage énergie (kcal) |
+| `minSugar`, `maxSugar` | Plage sucres (g) |
+| `minFat`, `maxFat` | Plage graisses (g) |
+| `sortBy` | `energy`, `sugars`, `fat`, `nutriscore` |
+| `order` | `asc` ou `desc` |
+| `page`, `pageSize` | Pagination (max 100 par page) |
+
+Réponse :
+
+```json
+{
+  "count": 12,
+  "totalFromOff": 1234,
+  "page": 1,
+  "pageSize": 50,
+  "products": [...]
+}
+```
+
+### `GET /api/product/{code}`
+
+Retourne le produit et des alternatives par catégorie (tri Nutri-Score).
+
+## Configuration
+
+### Frontend
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-**Backend** :
-Le backend écoute par défaut sur le port 8080. Vous pouvez modifier cela dans `Server.scala`.
-
-## 📚 Documentation
-
-- [Documentation Frontend](./frontend_react/README.md)
-- [Documentation Backend](./backend_scala/README.md)
-
-## 🛠️ Technologies utilisées
-
-### Frontend
-- **Next.js 14** - Framework React
-- **TypeScript** - Typage statique
-- **Tailwind CSS** - Framework CSS
-- **Lucide Icons** - Icônes
-
 ### Backend
-- **Scala 3** - Langage de programmation
-- **http4s** - Framework HTTP
-- **Circe** - Sérialisation JSON
-- **Cats Effect** - Programmation asynchrone
 
-## 🤝 Contribution
+| Variable | Défaut | Description |
+|----------|--------|-------------|
+| `PORT` | 8080 | Port du serveur |
+| `CORS_ORIGINS` | `http://localhost:3000` | Origines autorisées (séparées par virgule) |
+| `OFF_TIMEOUT_MS` | 10000 | Timeout appels OpenFoodFacts |
+| `CACHE_TTL_SECONDS` | 300 | Durée du cache en mémoire |
+| `RATE_LIMIT_PER_MINUTE` | 30 | Limite par IP |
 
-Les contributions sont les bienvenues ! Merci de :
+## Tests backend
 
-1. Créer une branche pour vos modifications
-2. Suivre les conventions de code existantes
-3. Tester vos modifications
-4. Soumettre un pull request avec une description claire
+```bash
+cd backend_scala
+sbt test
+```
 
-## 📝 License
+## Structure
 
-Ce projet est sous licence MIT.
+```
+foodfact/
+├── frontend_react/     # Next.js + TypeScript + Tailwind
+├── backend_scala/      # Scala 3 + http4s + Circe
+├── docker-compose.yml
+└── README.md
+```
 
-## 🙏 Remerciements
+## Technologies
+
+**Frontend** : Next.js, TypeScript, Tailwind CSS, Recharts, Lucide
+
+**Backend** : Scala 3, http4s, Circe, Cats Effect, MUnit
+
+## License
+
+MIT
+
+## Remerciements
 
 - [OpenFoodFacts](https://world.openfoodfacts.org/) pour l'API et les données
-- La communauté open source pour les outils et bibliothèques utilisés

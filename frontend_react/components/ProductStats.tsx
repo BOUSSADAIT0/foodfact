@@ -205,7 +205,7 @@ export default function ProductStats({ products }: ProductStatsProps) {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
@@ -244,7 +244,7 @@ export default function ProductStats({ products }: ProductStatsProps) {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
@@ -289,9 +289,9 @@ export default function ProductStats({ products }: ProductStatsProps) {
                       border: "1px solid #e5e7eb",
                       borderRadius: "8px",
                     }}
-                    formatter={(value: number, name: string, props: any) => [
-                      `${value} produits`,
-                      props.payload.fullName || name,
+                    formatter={(value, name, props) => [
+                      `${value ?? 0} produits`,
+                      (props as { payload?: { fullName?: string } }).payload?.fullName || name,
                     ]}
                   />
                   <Bar dataKey="value" fill={COLORS.primary} radius={[0, 8, 8, 0]} />
@@ -322,7 +322,7 @@ export default function ProductStats({ products }: ProductStatsProps) {
                       border: "1px solid #e5e7eb",
                       borderRadius: "8px",
                     }}
-                    formatter={(value: number) => `${value} produits`}
+                    formatter={(value) => `${value ?? 0} produits`}
                   />
                   <Bar dataKey="value" fill={COLORS.cyan} radius={[0, 8, 8, 0]} />
                 </BarChart>

@@ -1,14 +1,15 @@
-"use client";
+"use client"
 
-interface LabelProps {
-  htmlFor?: string;
-  children: React.ReactNode;
-}
+import * as React from "react"
+import { cn } from "@/lib/utils"
 
-export function Label({ htmlFor, children }: LabelProps) {
+export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
+
+export function Label({ className, ...props }: LabelProps) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700">
-      {children}
-    </label>
-  );
+    <label
+      className={cn("text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)}
+      {...props}
+    />
+  )
 }

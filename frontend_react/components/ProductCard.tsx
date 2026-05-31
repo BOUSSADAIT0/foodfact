@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Zap, Award } from "lucide-react"
 import type { Product } from "@/lib/types"
+import { nutriscoreColors, ecoscoreColors, novaLabel } from "@/lib/scoreColors"
 
 interface ProductCardProps {
   product: Product
@@ -37,21 +38,9 @@ const borderGlows = [
 export default function ProductCard({ product }: ProductCardProps) {
   const [imgError, setImgError] = useState(false)
 
-  const nutriscoreColors: Record<string, string> = {
-    a: "bg-green-500",
-    b: "bg-lime-500",
-    c: "bg-yellow-500",
-    d: "bg-orange-500",
-    e: "bg-red-500",
-  }
-
-  const ecoscoreColors: Record<string, string> = {
-    a: "bg-green-500",
-    b: "bg-lime-500",
-    c: "bg-yellow-500",
-    d: "bg-orange-500",
-    e: "bg-red-500",
-  }
+  const nutriscoreColorsLocal = nutriscoreColors
+  const ecoscoreColorsLocal = ecoscoreColors
+  const nova = novaLabel(product.nova_group)
 
   // Générer un index basé sur le code produit pour varier les couleurs NFT
   const cardIndex = useMemo(() => {
@@ -126,10 +115,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               <div className="absolute top-3 right-3 flex flex-col gap-2 z-20">
                 {product.nutriscore_grade && (
                   <div className="relative">
-                    <div className={`absolute inset-0 ${nutriscoreColors[product.nutriscore_grade.toLowerCase()] || "bg-gray-500"} rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity`} />
+                    <div className={`absolute inset-0 ${nutriscoreColorsLocal[product.nutriscore_grade.toLowerCase()] || "bg-gray-500"} rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity`} />
                     <div
                       className={`relative w-11 h-11 rounded-xl ${
-                        nutriscoreColors[product.nutriscore_grade.toLowerCase()] || "bg-gray-500"
+                        nutriscoreColorsLocal[product.nutriscore_grade.toLowerCase()] || "bg-gray-500"
                       } flex items-center justify-center shadow-xl border-2 border-white/30 backdrop-blur-sm`}
                     >
                       <span className="text-lg font-bold text-white uppercase drop-shadow-lg">
@@ -140,13 +129,21 @@ export default function ProductCard({ product }: ProductCardProps) {
                 )}
                 {product.ecoscore_grade && (
                   <div className="relative">
-                    <div className={`absolute inset-0 ${ecoscoreColors[product.ecoscore_grade.toLowerCase()] || "bg-gray-500"} rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity`} />
+                    <div className={`absolute inset-0 ${ecoscoreColorsLocal[product.ecoscore_grade.toLowerCase()] || "bg-gray-500"} rounded-xl blur-md opacity-75 group-hover:opacity-100 transition-opacity`} />
                     <div
                       className={`relative w-11 h-11 rounded-xl ${
-                        ecoscoreColors[product.ecoscore_grade.toLowerCase()] || "bg-gray-500"
+                        ecoscoreColorsLocal[product.ecoscore_grade.toLowerCase()] || "bg-gray-500"
                       } flex items-center justify-center shadow-xl border-2 border-white/30 backdrop-blur-sm`}
                     >
                       <Leaf className="w-5 h-5 text-white drop-shadow-lg" />
+                    </div>
+                  </div>
+                )}
+                {nova && (
+                  <div className="relative">
+                    <div className={`absolute inset-0 ${nova.color} rounded-xl blur-md opacity-75`} />
+                    <div className={`relative px-2 h-11 rounded-xl ${nova.color} flex items-center justify-center shadow-xl border-2 border-white/30`}>
+                      <span className="text-[10px] font-bold text-white">{nova.label}</span>
                     </div>
                   </div>
                 )}
